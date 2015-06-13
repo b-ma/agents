@@ -20,7 +20,7 @@ class BaseGameEntity {
 
   isTagged() { return this._tag; }
   tag() { this._tag = true; }
-  untag() { this._tag = false; }
+  unTag() { this._tag = false; }
 }
 
 module.exports = BaseGameEntity;

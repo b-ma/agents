@@ -26,46 +26,81 @@ class SteeringBehaviors {
   }
 
   calculate() {
-    if (!this.vehicle.world.start) {
+    if (!this.vehicle.world.isStarted) {
       return new Vector();
     }
 
+    var tweakers = this.vehicle.world.steeringTweakers;
     var steerings = new Vector();
 
     if (this._seek && this.vehicle.world.target) {
-      var steering = this.seek(this.vehicle.world.target);
+      // these targets should be in the vehicle itself, not in world
+      var steering = this.seek(this.vehicle.world.target)
+      steering.multiply(tweakers.seek);
       steerings.add(steering);
     }
 
     if (this._flee && this.vehicle.world.target) {
-      var steering = this.flee(this.vehicle.world.target);
+      // these targets should be in the vehicle itself, not in world
+      var steering = this.flee(this.vehicle.world.target)
+      steering.multiply(tweakers.flee);
       steerings.add(steering);
     }
 
     if (this._arrive && this.vehicle.world.target) {
-      var steering = this.arrive(this.vehicle.world.target, 3);
+      // these targets should be in the vehicle itself, not in world
+      var deceleration = 3;
+      var steering = this.arrive(this.vehicle.world.target, deceleration);
+      steering.multiply(tweakers.arrive);
       steerings.add(steering);
     }
 
     if (this._pursuit) {
+      // these targets should be in the vehicle itself, not in world
       var steering = this.pursuit(this.vehicle.world.evader);
+      steering.multiply(tweakers.pursuit);
       steerings.add(steering);
     }
 
     if (this. _evade) {
+      // these targets should be in the vehicle itself, not in world
       var steering = this.evade(this.vehicle.world.pursuer);
+      steering.multiply(tweakers.evade);
       steerings.add(steering);
     }
 
     if (this._wander) {
-      var steering = this.wander();
+      var steering = this.wander()
+      steering.multiply(tweakers.wander);
       steerings.add(steering);
     }
 
-    if (this._wallAvoidance) {
-      var steering = this.wallAvoidance(this.vehicle.world.walls);
+    // doesn't work...
+    if (this._obstacleAvoidance) {
+      var steering = this.obstacleAvoidance(this.vehicle.world.obstacles)
+      steering.multiply(tweakers.obstacleAvoidance);
       steerings.add(steering);
     }
+
+    // doesn't work well
+    if (this._wallAvoidance) {
+      var steering = this.wallAvoidance(this.vehicle.world.walls)
+      steering.multiply(tweakers.wallAvoidance);
+      steerings.add(steering);
+    }
+
+    if (this._flock) {
+      // tag neighbors
+      this.vehicle.world.tagBoidsWithinRange(this.vehicle);
+
+      var flocks = new Vector();
+      flocks.add(this.separation(this.vehicle.neighbors).multiply(tweakers.separation));
+      flocks.add(this.alignment(this.vehicle.neighbors).multiply(tweakers.alignment));
+      flocks.add(this.cohesion(this.vehicle.neighbors).multiply(tweakers.cohesion));
+
+      steerings.add(flocks);
+    }
+
 
     return steerings;
   }
@@ -91,8 +126,14 @@ class SteeringBehaviors {
   wanderOn() { this._wander = true; }
   wanderOff() { this._wander = false; }
 
+  obstacleAvoidanceOn() { this._obstacleAvoidance = true; }
+  obstacleAvoidanceOff() { this._obstacleAvoidance = false; }
+
   wallAvoidanceOn() { this._wallAvoidance = true; }
   wallAvoidanceOff() { this._wallAvoidance = false; }
+
+  flockOn() { this._flock = true; }
+  flockOff() { this._flock = false; }
 
   // behaviors
   // --------------------------------------------
@@ -202,6 +243,7 @@ class SteeringBehaviors {
   }
 
   // prevent the agent colliding with the closest obstacle
+  // @NOTE - not tested properly
   obstacleAvoidance(obstacles) {
     // create a detection box proportionnal to the agent velocity
     var boxLength = this.params.minDetectionBoxLength +
@@ -240,7 +282,7 @@ class SteeringBehaviors {
       var cY = localPos.y;
 
       // calcule the sqrt part of the equation only once
-      var sqrtPart = Math.sqrt(expendedRadius * expendedRadius - cY * cY);
+      var sqrtPart = Math.sqrt(expandedRadius * expandedRadius - cY * cY);
 
       var ip = cX - sqrtPart;
       if (ip < 0) { ip = cX + sqrtPart; }
@@ -356,9 +398,62 @@ class SteeringBehaviors {
     this.feelers[2] = Vector.add(this.vehicle.position, tmp);
   }
 
+  // FLOCKS
+  // -------------------------------------------------------------
 
-  // visualize - debug tools
-  // all debug stuff should be in sterring
+  separation(neighbors) {
+    var steering = new Vector();
+
+    neighbors.forEach(function(neighbor, index) {
+      var toAgent = Vector.substract(this.vehicle.position, neighbor.position);
+      // scale the force inversely proportionnal to the agent distance from its neighbor
+      var distance = toAgent.magnitude();
+      toAgent.normalize().divide(distance); // .multiply(100);
+
+      steering.add(toAgent);
+    }, this);
+
+    // if (this.vehicle.isTest) { console.log(steering); }
+    return steering;
+  }
+
+  alignment(neighbors) {
+    var averageHeading = new Vector();
+    var neighborCount = neighbors.length;
+
+    neighbors.forEach(function(neighbor) {
+      averageHeading.add(neighbor.heading);
+    });
+
+    if (neighborCount > 0) {
+      averageHeading.divide(neighborCount);
+      averageHeading.substract(this.vehicle.heading);
+    }
+
+    return averageHeading;
+  }
+
+  cohesion(neighbors) {
+    var centerOfMass = new Vector();
+    var steering = new Vector();
+    var neighborCount = neighbors.length;
+
+    neighbors.forEach(function(neighbor) {
+      centerOfMass.add(neighbor.position);
+    });
+
+    if (neighborCount) {
+      centerOfMass.divide(neighborCount);
+      steering = this.seek(centerOfMass);
+    }
+
+    return steering;
+  }
+
+  // -------------------------------------------------------------
+  // DEBUG VISUALIZATION
+  // -------------------------------------------------------------
+
   debugFeelers(ctx) {
     this.feelers.forEach(function(feeler) {
       ctx.save();

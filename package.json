@@ -2,17 +2,23 @@
   "name": "agents",
   "version": "1.0.0",
   "description": "Atonomous agent library",
-  "main": "index.js",
-  "scripts": {
-    "transform": "find . -type f | grep -v \"node_modules\" | grep .es6.js$ | while read -r line; do babel --modules common --optional selfContained $line --out-file ${line/.es6/\"\"} --source-maps-inline; done;",
-    "bundle": "browserify $npm_package_main > ${npm_package_main/\".js\"/\".umd.js\"} -s $npm_package_name -d",
-    "prebundle": "npm run transform",
-    "watch:transform": "nodemon -e es6.js --ignore node_modules/ -x npm run transform",
-    "watch:bundle": "nodemon -e es6.js --ignore node_modules/ -x npm run bundle",
-    "hint": "find . -type f | grep -v \"node_modules\" | grep .es6.js$ | while read -r line; do jshint $line; done;"
-  },
+  "main": "agents.js",
   "author": "Benjamin Matuszewski",
-  "license": "ISC",
+  "scripts": {
+    "transpile": "node ./bin/scripts.js --transpile",
+    "prebundle": "npm run hint && npm run transpile",
+    "bundle": "node ./bin/scripts.js --bundle",
+    "postbundle": "npm run uglify",
+    "uglify": "node ./bin/scripts.js --uglify",
+    "watch": "node ./bin/scripts.js --watch",
+    "test": "npm run hint; tac6",
+    "hint": "find src -type f | while read -r line; do jshint $line; done;"
+  },
+  "license": "BSD-3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wavesjs/ui"
+  },
   "jshintConfig": {
     "esnext": true,
     "browser": true,
@@ -20,10 +26,14 @@
     "devel": true
   },
   "dependencies": {
-    "babel-runtime": "^4.1.1",
+    "babel": "^5.5.4",
     "vector": "b-ma/vector2d"
   },
   "devDependencies": {
-    "babel-runtime": "^4.4.3"
+    "browserify": "^9.0.3",
+    "fs-extra": "^0.16.3",
+    "jshint": "^2.6.0",
+    "node-watch": "^0.3.4",
+    "uglify-js": "^2.4.16"
   }
 }

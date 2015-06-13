@@ -1,0 +1,28 @@
+"use strict";
+
+var utils = {
+
+  TwoPI: 2 * Math.PI,
+
+  rand: function rand() {
+    return Math.random();
+  },
+
+  degsToRads: function degsToRads(degs) {
+    return this.TwoPI * (degs / 360);
+  },
+
+  // return val between -1 and 1
+  randClamped: function randClamped() {
+    // return Math.random() * Math.random()
+    return Math.random() * 2 - 1;
+  },
+
+  randBool: function randBool() {
+    return Math.random() > 0.5;
+  }
+
+};
+
+module.exports = utils;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy92ZWhpY2xlLmVzNi5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUFBLElBQUksS0FBSyxHQUFHOztBQUVWLE9BQUssRUFBRSxDQUFDLEdBQUcsSUFBSSxDQUFDLEVBQUU7O0FBRWxCLE1BQUksRUFBRSxnQkFBVztBQUNmLFdBQU8sSUFBSSxDQUFDLE1BQU0sRUFBRSxDQUFDO0dBQ3RCOztBQUVELFlBQVUsRUFBRSxvQkFBUyxJQUFJLEVBQUU7QUFDekIsV0FBTyxJQUFJLENBQUMsS0FBSyxJQUFJLElBQUksR0FBRyxHQUFHLENBQUEsQUFBQyxDQUFDO0dBQ2xDOzs7QUFHRCxhQUFXLEVBQUUsdUJBQVc7O0FBRXRCLFdBQU8sSUFBSSxDQUFDLE1BQU0sRUFBRSxHQUFHLENBQUMsR0FBRyxDQUFDLENBQUM7R0FDOUI7O0FBRUQsVUFBUSxFQUFHLG9CQUFXO0FBQ3BCLFdBQVEsSUFBSSxDQUFDLE1BQU0sRUFBRSxHQUFHLEdBQUcsQ0FBRTtHQUM5Qjs7Q0FFRixDQUFBOztBQUVELE1BQU0sQ0FBQyxPQUFPLEdBQUcsS0FBSyxDQUFDIiwiZmlsZSI6InNyYy92ZWhpY2xlLmVzNi5qcyIsInNvdXJjZXNDb250ZW50IjpbInZhciB1dGlscyA9IHtcblxuICBUd29QSTogMiAqIE1hdGguUEksXG5cbiAgcmFuZDogZnVuY3Rpb24oKSB7XG4gICAgcmV0dXJuIE1hdGgucmFuZG9tKCk7XG4gIH0sXG5cbiAgZGVnc1RvUmFkczogZnVuY3Rpb24oZGVncykge1xuICAgIHJldHVybiB0aGlzLlR3b1BJICogKGRlZ3MgLyAzNjApO1xuICB9LFxuXG4gIC8vIHJldHVybiB2YWwgYmV0d2VlbiAtMSBhbmQgMVxuICByYW5kQ2xhbXBlZDogZnVuY3Rpb24oKSB7XG4gICAgLy8gcmV0dXJuIE1hdGgucmFuZG9tKCkgKiBNYXRoLnJhbmRvbSgpXG4gICAgcmV0dXJuIE1hdGgucmFuZG9tKCkgKiAyIC0gMTtcbiAgfSxcblxuICByYW5kQm9vbDogIGZ1bmN0aW9uKCkge1xuICAgIHJldHVybiAoTWF0aC5yYW5kb20oKSA+IDAuNSk7XG4gIH1cblxufVxuXG5tb2R1bGUuZXhwb3J0cyA9IHV0aWxzO1xuIl19
