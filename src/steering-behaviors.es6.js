@@ -2,22 +2,25 @@ var Vector = require('vector');
 var utils  = require('./utils');
 
 class SteeringBehaviors {
-  constructor(vehicle) {
+  constructor(vehicle, options) {
     this.vehicle = vehicle;
 
+    // @TODO should be overridable with options
+    // @TODO should be in a normalized form
     this.params = {
       minDetectionBoxLength: 40,
       wallDetectionFeelerLength: 40
-
     };
+    // variables for wander behavior
+    this.wanderRadius = 6;
+    this.wanderDistance = 30;
+    this.wanderJitter = 4;
 
     // antenna used in wall avoidance
     this.feelers = [];
-    // variables for wander behavior
-    this.wanderRadius = 6;
-    this.wanderDistance = 15;
-    this.wanderJitter = 2;
-    // initialize target -> circle of wanderRadius centered on the agent
+
+    // initialize wander target
+    // -> circle of wanderRadius centered on the agent
     var theta = utils.rand() * utils.TwoPI;
     // project theta on the wander circle
     this.wanderTarget = new Vector(this.wanderRadius * Math.cos(theta),
@@ -25,6 +28,7 @@ class SteeringBehaviors {
 
   }
 
+  // this has too many dependecies with the world
   calculate() {
     if (!this.vehicle.world.isStarted) {
       return new Vector();
@@ -70,7 +74,7 @@ class SteeringBehaviors {
     }
 
     if (this._wander) {
-      var steering = this.wander()
+      var steering = this.wander();
       steering.multiply(tweakers.wander);
       steerings.add(steering);
     }
@@ -471,9 +475,6 @@ class SteeringBehaviors {
 
   debugWander(ctx) {
     ctx.save();
-    ctx.translate(this.vehicle.position.x, this.vehicle.position.y);
-    ctx.rotate(this.vehicle.heading.direction());
-
     // move to wander circle center
     ctx.translate(this.wanderDistance, 0);
 

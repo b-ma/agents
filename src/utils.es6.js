@@ -1,6 +1,6 @@
 var utils = {
 
-  TwoPI: 2 * Math.PI,
+  TwoPI: (2 * Math.PI),
 
   rand: function() {
     return Math.random();

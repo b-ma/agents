@@ -1,4 +1,4 @@
-var vector = require('vector');
+var Vector = require('vector');
 var BaseGameEntity = require('./base-game-entity');
 var SteeringBehaviors = require('./steering-behaviors');
 
@@ -21,11 +21,15 @@ class MovingEntity extends BaseGameEntity {
     this.mass = mass;
     // maximum speed (float)
     this.maxSpeed = maxSpeed;
+
+    // @NOTE to implement
     // maximum force the entity can produce to power itself (think motor engine)
     this.maxForce = maxForce;
     // maximum rate at which the entity can rotate (rad/sec)
     this.maxTurnRate = maxTurnRate;
-    // ignore scale
+
+    // used in steeringBehaviors
+    this.neighbors = [];
   }
 
   speed() { return this.velocity.magnitude(); }
@@ -34,7 +38,6 @@ class MovingEntity extends BaseGameEntity {
   update(dt) {
     // define all the forces applied on the agent
     var steeringForces = this.steerings.calculate();
-    // console.log(steeringForces);
     // newton
     this.acceleration = Vector.divide(steeringForces, this.mass);
     // reverse fourier integration - could be a service
@@ -55,4 +58,4 @@ class MovingEntity extends BaseGameEntity {
   render(ctx, buffers/*, worldSize */) {}
 }
 
-module.exports = MovingEntity
+module.exports = MovingEntity;
